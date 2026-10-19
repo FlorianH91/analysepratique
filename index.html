@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grille d'Analyse de Pratique - EPS</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --t1: #2b7a78;
+            --t2: #d69e2e;
+            --t3: #e06d53;
+            --t4: #2b7a78;
+            --t5: #38a169;
+            --bg-body: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .main-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .main-header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .main-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Encart Identité */
+        .identity-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .input-group input {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #f8fafc;
+        }
+
+        .input-group input:focus {
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+            background: #fff;
+        }
+
+        /* Barre de progression */
+        .progress-wrapper {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .progress-container {
+            background: #e2e8f0;
+            border-radius: 99px;
+            height: 8px;
+            width: 100%;
+            max-width: 350px;
+            margin: 8px auto 0 auto;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #3182ce, #38a169);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 99px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .section-title {
+            padding: 16px 24px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .bg-t1 { background-color: var(--t1); }
+        .bg-t2 { background-color: var(--t2); }
+        .bg-t3 { background-color: var(--t3); }
+        .bg-t4 { background-color: var(--t4); }
+        .bg-t5 { background-color: var(--t5); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: #4a5568;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: #fdfdfe; }
+
+        .col-indicator { width: 52%; font-size: 0.95rem; }
+        .col-check { width: 12%; text-align: center; }
+
+        /* Custom Radio Buttons */
+        .col-check input[type="radio"] {
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #cbd5e0;
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .col-check input[type="radio"]:hover {
+            border-color: #3182ce;
+            transform: scale(1.1);
+        }
+
+        .col-check input[type="radio"]:checked {
+            background-color: #3182ce;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 4px rgba(49, 130, 206, 0.15);
+        }
+
+        .col-check input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* Chart Section */
+        .chart-card {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(to bottom, #ffffff, #fcfdfd);
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 420px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            margin-bottom: 50px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .btn-primary {
+            background-color: #3182ce;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2b6cb0;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #edf2f7;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-1px);
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .card, .identity-card { box-shadow: none; border: 1px solid #cbd5e0; page-break-inside: avoid; }
+            .actions, .progress-wrapper { display: none; }
+            .input-group input { border: none; background: transparent; padding: 0; font-weight: bold; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="main-header">
+        <h1>Grille d'Analyse de Pratique</h1>
+        <p>Outil interactif d'évaluation et de synthèse pédagogique</p>
+    </div>
+
+    <!-- ENCART INFORMATIONS / IDENTITÉ -->
+    <div class="identity-card">
+        <div class="input-group">
+            <label for="nomObserve">Nom de la personne observée</label>
+            <input type="text" id="nomObserve" placeholder="ex : Dupont">
+        </div>
+        <div class="input-group">
+            <label for="prenomObserve">Prénom de la personne observée</label>
+            <input type="text" id="prenomObserve" placeholder="ex : Jean">
+        </div>
+        <div class="input-group">
+            <label for="observateur">Observateur / Évaluateur</label>
+            <input type="text" id="observateur" placeholder="ex : Formateur / Tuteur">
+        </div>
+        <div class="input-group">
+            <label for="dateSeance">Date de la séance</label>
+            <input type="date" id="dateSeance">
+        </div>
+    </div>
+
+    <!-- PROGRESSION -->
+    <div class="progress-wrapper">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Progression de la grille : <strong id="progressText">0</strong>%</span>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <form id="evalForm">
+        <!-- TEMPS 1 -->
+        <div class="card">
+            <div class="section-title bg-t1">TEMPS 1 – Accueil</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-indicator">Indicateurs à observer</th>
+                        <th class="col-check">1<br>Non installé</th>
+                        <th class="col-check">2<br>Fragile</th>
+                        <th class="col-check">3<br>En cours</th>
+                        <th class="col-check">4<br>Maîtrisé</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Gère les trajets, le temps de vestiaire et l’arrivée sur l’installation.</td><td class="col-check"><input type="radio" name="t1_1" value="1"></td><td class="col-check"><input type="radio" name="t1_1" value="2"></td><td class="col-check"><input type="radio" name="t1_1" value="3"></td><td class="col-check"><input type="radio" name="t1_1" value="4"></td></tr>
+                    <tr><td>Réalise l’appel et traite absences, retards ou oublis de tenue.</td><td class="col-check"><input type="radio" name="t1_2" value="1"></td><td class="col-check"><input type="radio" name="t1_2" value="2"></td><td class="col-check"><input type="radio" name="t1_2" value="3"></td><td class="col-check"><input type="radio" name="t1_2" value="4"></td></tr>
+                    <tr><td>Met en place une routine d’entrée claire et rassurante.</td><td class="col-check"><input type="radio" name="t1_3" value="1"></td><td class="col-check"><input type="radio" name="t1_3" value="2"></td><td class="col-check"><input type="radio" name="t1_3" value="3"></td><td class="col-check"><input type="radio" name="t1_3" value="4"></td></tr>
+                    <tr><td>Anticipe les comportements à risque et vérifie les conditions de sécurité.</td><td class="col-check"><input type="radio" name="t1_4" value="1"></td><td class="col-check"><input type="radio" name="t1_4" value="2"></td><td class="col-check"><input type="radio" name="t1_4" value="3"></td><td class="col-check"><input type="radio" name="t1_4" value="4"></td></tr>
+                    <tr><td>Installe un climat serein et capte rapidement l’attention du groupe.</td><td class="col-check"><input type="radio" name="t1_5" value="1"></td><td class="col-check"><input type="radio" name="t1_5" value="2"></td><td class="col-check"><input type="radio" name="t1_5" value="3"></td><td class="col-check"><input type="radio" name="t1_5" value="4"></td></tr>
+                    <tr><td>Les élèves installent le matériel sans perte de temps excessive.</td><td class="col-check"><input type="radio" name="t1_6" value="1"></td><td class="col-check"><input type="radio" name="t1_6" value="2"></td><td class="col-check"><input type="radio" name="t1_6" value="3"></td><td class="col-check"><input type="radio" name="t1_6" value="4"></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TEMPS 2 -->
+        <div class="card">
+            <div class="section-title bg-t2">TEMPS 2 – Consignes</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-indicator">Indicateurs à observer</th>
+                        <th class="col-check">1<br>Non installé</th>
+                        <th class="col-check">2<br>Fragile</th>
+                        <th class="col-check">3<br>En cours</th>
+                        <th class="col-check">4<br>Maîtrisé</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Obtient l’attention de tous avant de donner les consignes.</td><td class="col-check"><input type="radio" name="t2_1" value="1"></td><td class="col-check"><input type="radio" name="t2_1" value="2"></td><td class="col-check"><input type="radio" name="t2_1" value="3"></td><td class="col-check"><input type="radio" name="t2_1" value="4"></td></tr>
+                    <tr><td>Utilise un vocabulaire clair, précis et adapté aux élèves.</td><td class="col-check"><input type="radio" name="t2_2" value="1"></td><td class="col-check"><input type="radio" name="t2_2" value="2"></td><td class="col-check"><input type="radio" name="t2_2" value="3"></td><td class="col-check"><input type="radio" name="t2_2" value="4"></td></tr>
+                    <tr><td>Varie les supports de consigne : oral, démonstration, écrit, tableau, vidéo…</td><td class="col-check"><input type="radio" name="t2_3" value="1"></td><td class="col-check"><input type="radio" name="t2_3" value="2"></td><td class="col-check"><input type="radio" name="t2_3" value="3"></td><td class="col-check"><input type="radio" name="t2_3" value="4"></td></tr>
+                    <tr><td>Vérifie la compréhension par questionnement ou reformulation.</td><td class="col-check"><input type="radio" name="t2_4" value="1"></td><td class="col-check"><input type="radio" name="t2_4" value="2"></td><td class="col-check"><input type="radio" name="t2_4" value="3"></td><td class="col-check"><input type="radio" name="t2_4" value="4"></td></tr>
+                    <tr><td>Ajuste la quantité et la durée des informations données.</td><td class="col-check"><input type="radio" name="t2_5" value="1"></td><td class="col-check"><input type="radio" name="t2_5" value="2"></td><td class="col-check"><input type="radio" name="t2_5" value="3"></td><td class="col-check"><input type="radio" name="t2_5" value="4"></td></tr>
+                    <tr><td>Permet une entrée rapide, autonome et engagée dans la tâche.</td><td class="col-check"><input type="radio" name="t2_6" value="1"></td><td class="col-check"><input type="radio" name="t2_6" value="2"></td><td class="col-check"><input type="radio" name="t2_6" value="3"></td><td class="col-check"><input type="radio" name="t2_6" value="4"></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TEMPS 3 -->
+        <div class="card">
+            <div class="section-title bg-t3">TEMPS 3 – Situations et régulations</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-indicator">Indicateurs à observer</th>
+                        <th class="col-check">1<br>Non installé</th>
+                        <th class="col-check">2<br>Fragile</th>
+                        <th class="col-check">3<br>En cours</th>
+                        <th class="col-check">4<br>Maîtrisé</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Les objectifs d’apprentissage et les contenus visés sont explicites.</td><td class="col-check"><input type="radio" name="t3_1" value="1"></td><td class="col-check"><input type="radio" name="t3_1" value="2"></td><td class="col-check"><input type="radio" name="t3_1" value="3"></td><td class="col-check"><input type="radio" name="t3_1" value="4"></td></tr>
+                    <tr><td>Les critères de réussite sont connus des élèves et exploités.</td><td class="col-check"><input type="radio" name="t3_2" value="1"></td><td class="col-check"><input type="radio" name="t3_2" value="2"></td><td class="col-check"><input type="radio" name="t3_2" value="3"></td><td class="col-check"><input type="radio" name="t3_2" value="4"></td></tr>
+                    <tr><td>La situation proposée est adaptée, sécurisée et porteuse d’apprentissages.</td><td class="col-check"><input type="radio" name="t3_3" value="1"></td><td class="col-check"><input type="radio" name="t3_3" value="2"></td><td class="col-check"><input type="radio" name="t3_3" value="3"></td><td class="col-check"><input type="radio" name="t3_3" value="4"></td></tr>
+                    <tr><td>Le professeur se place de manière à voir l’ensemble des élèves.</td><td class="col-check"><input type="radio" name="t3_4" value="1"></td><td class="col-check"><input type="radio" name="t3_4" value="2"></td><td class="col-check"><input type="radio" name="t3_4" value="3"></td><td class="col-check"><input type="radio" name="t3_4" value="4"></td></tr>
+                    <tr><td>Les régulations interviennent au bon moment, de façon ciblée et utile.</td><td class="col-check"><input type="radio" name="t3_5" value="1"></td><td class="col-check"><input type="radio" name="t3_5" value="2"></td><td class="col-check"><input type="radio" name="t3_5" value="3"></td><td class="col-check"><input type="radio" name="t3_5" value="4"></td></tr>
+                    <tr><td>Des variables permettent de simplifier, complexifier ou différencier.</td><td class="col-check"><input type="radio" name="t3_6" value="1"></td><td class="col-check"><input type="radio" name="t3_6" value="2"></td><td class="col-check"><input type="radio" name="t3_6" value="3"></td><td class="col-check"><input type="radio" name="t3_6" value="4"></td></tr>
+                    <tr><td>La coopération, l’encouragement et les progrès de chacun sont valorisés.</td><td class="col-check"><input type="radio" name="t3_7" value="1"></td><td class="col-check"><input type="radio" name="t3_7" value="2"></td><td class="col-check"><input type="radio" name="t3_7" value="3"></td><td class="col-check"><input type="radio" name="t3_7" value="4"></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TEMPS 4 -->
+        <div class="card">
+            <div class="section-title bg-t4">TEMPS 4 – Gérer les transitions</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-indicator">Indicateurs à observer</th>
+                        <th class="col-check">1<br>Non installé</th>
+                        <th class="col-check">2<br>Fragile</th>
+                        <th class="col-check">3<br>En cours</th>
+                        <th class="col-check">4<br>Maîtrisé</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Annonce clairement les passages d’une situation à l’autre.</td><td class="col-check"><input type="radio" name="t4_1" value="1"></td><td class="col-check"><input type="radio" name="t4_1" value="2"></td><td class="col-check"><input type="radio" name="t4_1" value="3"></td><td class="col-check"><input type="radio" name="t4_1" value="4"></td></tr>
+                    <tr><td>Limite les temps morts et les déplacements inutiles.</td><td class="col-check"><input type="radio" name="t4_2" value="1"></td><td class="col-check"><input type="radio" name="t4_2" value="2"></td><td class="col-check"><input type="radio" name="t4_2" value="3"></td><td class="col-check"><input type="radio" name="t4_2" value="4"></td></tr>
+                    <tr><td>Organise des regroupements rapides et ordonnés.</td><td class="col-check"><input type="radio" name="t4_3" value="1"></td><td class="col-check"><input type="radio" name="t4_3" value="2"></td><td class="col-check"><input type="radio" name="t4_3" value="3"></td><td class="col-check"><input type="radio" name="t4_3" value="4"></td></tr>
+                    <tr><td>Conduit un bilan intermédiaire bref mais utile aux élèves.</td><td class="col-check"><input type="radio" name="t4_4" value="1"></td><td class="col-check"><input type="radio" name="t4_4" value="2"></td><td class="col-check"><input type="radio" name="t4_4" value="3"></td><td class="col-check"><input type="radio" name="t4_4" value="4"></td></tr>
+                    <tr><td>S’appuie sur les retours des élèves pour ajuster la suite.</td><td class="col-check"><input type="radio" name="t4_5" value="1"></td><td class="col-check"><input type="radio" name="t4_5" value="2"></td><td class="col-check"><input type="radio" name="t4_5" value="3"></td><td class="col-check"><input type="radio" name="t4_5" value="4"></td></tr>
+                    <tr><td>Fait explicitement le lien avec la tâche suivante ou le réinvestissement attendu.</td><td class="col-check"><input type="radio" name="t4_6" value="1"></td><td class="col-check"><input type="radio" name="t4_6" value="2"></td><td class="col-check"><input type="radio" name="t4_6" value="3"></td><td class="col-check"><input type="radio" name="t4_6" value="4"></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TEMPS 5 -->
+        <div class="card">
+            <div class="section-title bg-t5">TEMPS 5 – Bilan de leçon</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-indicator">Indicateurs à observer</th>
+                        <th class="col-check">1<br>Non installé</th>
+                        <th class="col-check">2<br>Fragile</th>
+                        <th class="col-check">3<br>En cours</th>
+                        <th class="col-check">4<br>Maîtrisé</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Prend un temps explicite de bilan en fin de leçon.</td><td class="col-check"><input type="radio" name="t5_1" value="1"></td><td class="col-check"><input type="radio" name="t5_1" value="2"></td><td class="col-check"><input type="radio" name="t5_1" value="3"></td><td class="col-check"><input type="radio" name="t5_1" value="4"></td></tr>
+                    <tr><td>Fait verbaliser les acquis, les ressentis ou les difficultés rencontrées.</td><td class="col-check"><input type="radio" name="t5_2" value="1"></td><td class="col-check"><input type="radio" name="t5_2" value="2"></td><td class="col-check"><input type="radio" name="t5_2" value="3"></td><td class="col-check"><input type="radio" name="t5_2" value="4"></td></tr>
+                    <tr><td>Donne des repères pour situer les progrès ou le degré d’acquisition.</td><td class="col-check"><input type="radio" name="t5_3" value="1"></td><td class="col-check"><input type="radio" name="t5_3" value="2"></td><td class="col-check"><input type="radio" name="t5_3" value="3"></td><td class="col-check"><input type="radio" name="t5_3" value="4"></td></tr>
+                    <tr><td>Valorise l’engagement et les réussites de tous les élèves.</td><td class="col-check"><input type="radio" name="t5_4" value="1"></td><td class="col-check"><input type="radio" name="t5_4" value="2"></td><td class="col-check"><input type="radio" name="t5_4" value="3"></td><td class="col-check"><input type="radio" name="t5_4" value="4"></td></tr>
+                    <tr><td>Annonce une perspective claire pour la prochaine séance.</td><td class="col-check"><input type="radio" name="t5_5" value="1"></td><td class="col-check"><input type="radio" name="t5_5" value="2"></td><td class="col-check"><input type="radio" name="t5_5" value="3"></td><td class="col-check"><input type="radio" name="t5_5" value="4"></td></tr>
+                    <tr><td>Installe un climat d’écoute et de clôture sereine de la leçon.</td><td class="col-check"><input type="radio" name="t5_6" value="1"></td><td class="col-check"><input type="radio" name="t5_6" value="2"></td><td class="col-check"><input type="radio" name="t5_6" value="3"></td><td class="col-check"><input type="radio" name="t5_6" value="4"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+
+    <!-- SECTION DIAGRAMME RADAR AVEC COULEURS MULTIPLES -->
+    <div class="card chart-card">
+        <h2 style="margin-top:0; font-size: 1.3rem; color: #1a202c; font-weight: 600;">Synthèse Graphique – Profil Radar Coloré</h2>
+        <div class="chart-container">
+            <canvas id="radarChart"></canvas>
+        </div>
+    </div>
+
+    <!-- BOUTONS -->
+    <div class="actions">
+        <button class="btn btn-primary" onclick="window.print()">
+            🖨️ Imprimer / Exporter en PDF
+        </button>
+        <button class="btn btn-secondary" onclick="resetForm()">
+            🔄 Réinitialiser la grille
+        </button>
+    </div>
+</div>
+
+<script>
+    const totalQuestions = 31;
+
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    const radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: [
+                'Temps 1 : Accueil',
+                'Temps 2 : Consignes',
+                'Temps 3 : Situations & Régulations',
+                'Temps 4 : Transitions',
+                'Temps 5 : Bilan'
+            ],
+            datasets: [{
+                label: 'Niveau moyen de maîtrise (/4)',
+                data: [0, 0, 0, 0, 0],
+                // Couleurs dynamiques et attrayantes pour le polygone radar
+                backgroundColor: 'rgba(56, 161, 105, 0.2)',
+                borderColor: '#2b7a78',
+                // Utilisation d'un tableau de couleurs pour chaque point des axes du radar
+                pointBackgroundColor: ['#2b7a78', '#d69e2e', '#e06d53', '#2b7a78', '#38a169'],
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#2b7a78',
+                borderWidth: 3,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    angleLines: { color: '#e2e8f0' },
+                    grid: { color: '#e2e8f0' },
+                    pointLabels: {
+                        font: { size: 12, weight: '600', family: 'Inter' },
+                        color: '#2d3748'
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 4,
+                    ticks: {
+                        stepSize: 1,
+                        backdropColor: 'transparent',
+                        font: { size: 10 }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { size: 12, family: 'Inter', weight: '500' }, color: '#4a5568' }
+                }
+            }
+        }
+    });
+
+    function updateApp() {
+        const tempsPrefixes = ['t1', 't2', 't3', 't4', 't5'];
+        let checkedCount = 0;
+
+        const averages = tempsPrefixes.map(prefix => {
+            const inputs = document.querySelectorAll(`input[name^="${prefix}_"]:checked`);
+            checkedCount += inputs.length;
+            if (inputs.length === 0) return 0;
+            let sum = 0;
+            inputs.forEach(input => sum += parseInt(input.value));
+            return parseFloat((sum / inputs.length).toFixed(2));
+        });
+
+        // Mettre à jour le graphe
+        radarChart.data.datasets[0].data = averages;
+        radarChart.update();
+
+        // Mettre à jour la barre de progression
+        const progressPercent = Math.round((checkedCount / totalQuestions) * 100);
+        document.getElementById('progressBar').style.width = progressPercent + '%';
+        document.getElementById('progressText').innerText = progressPercent;
+    }
+
+    document.getElementById('evalForm').addEventListener('change', updateApp);
+
+    function resetForm() {
+        document.getElementById('evalForm').reset();
+        document.getElementById('nomObserve').value = '';
+        document.getElementById('prenomObserve').value = '';
+        document.getElementById('observateur').value = '';
+        document.getElementById('dateSeance').value = '';
+        updateApp();
+    }
+</script>
+
+</body>
+</html>
