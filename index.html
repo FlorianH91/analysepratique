@@ -61,7 +61,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
             border: 1px solid var(--border);
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
         }
 
@@ -280,12 +280,8 @@
     <!-- ENCART INFORMATIONS / IDENTITÉ -->
     <div class="identity-card">
         <div class="input-group">
-            <label for="nomObserve">Nom de la personne observée</label>
-            <input type="text" id="nomObserve" placeholder="ex : Dupont">
-        </div>
-        <div class="input-group">
-            <label for="prenomObserve">Prénom de la personne observée</label>
-            <input type="text" id="prenomObserve" placeholder="ex : Jean">
+            <label for="personneObservee">Personne observée</label>
+            <input type="text" id="personneObservee" placeholder="ex : DUPONT Jean">
         </div>
         <div class="input-group">
             <label for="observateur">Observateur / Évaluateur</label>
@@ -464,10 +460,8 @@
             datasets: [{
                 label: 'Niveau moyen de maîtrise (/4)',
                 data: [0, 0, 0, 0, 0],
-                // Couleurs dynamiques et attrayantes pour le polygone radar
                 backgroundColor: 'rgba(56, 161, 105, 0.2)',
                 borderColor: '#2b7a78',
-                // Utilisation d'un tableau de couleurs pour chaque point des axes du radar
                 pointBackgroundColor: ['#2b7a78', '#d69e2e', '#e06d53', '#2b7a78', '#38a169'],
                 pointBorderColor: '#fff',
                 pointHoverBackgroundColor: '#fff',
@@ -519,11 +513,9 @@
             return parseFloat((sum / inputs.length).toFixed(2));
         });
 
-        // Mettre à jour le graphe
         radarChart.data.datasets[0].data = averages;
         radarChart.update();
 
-        // Mettre à jour la barre de progression
         const progressPercent = Math.round((checkedCount / totalQuestions) * 100);
         document.getElementById('progressBar').style.width = progressPercent + '%';
         document.getElementById('progressText').innerText = progressPercent;
@@ -533,8 +525,7 @@
 
     function resetForm() {
         document.getElementById('evalForm').reset();
-        document.getElementById('nomObserve').value = '';
-        document.getElementById('prenomObserve').value = '';
+        document.getElementById('personneObservee').value = '';
         document.getElementById('observateur').value = '';
         document.getElementById('dateSeance').value = '';
         updateApp();
